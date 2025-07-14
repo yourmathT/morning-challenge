@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>굿모닝 챌린지</title>
+  <title>굿모닝 출석체크</title>
   <style>
     body {
       font-family: 'Jua', sans-serif;
@@ -26,14 +24,14 @@
   <input type="text" id="studentId" placeholder="학번 입력"><br>
   <input type="text" id="name" placeholder="이름 입력"><br>
 
-  <p id="clock" style="font-size: 18px; margin-bottom: 20px;">시간 불러오는 중...</p>
+  <p id="clock" style="font-size: 18px; margin-bottom: 20px;">현재 시간 불러오는 중...</p>
 
   <button onclick="submitForm()">제출</button>
 
   <p id="result" style="margin-top: 20px; font-size: 18px;"></p>
 
   <script>
-    // 실시간 시계
+    // 실시간 시계 표시
     function updateClock() {
       const now = new Date();
       const time = now.toLocaleTimeString('ko-KR');
@@ -52,9 +50,9 @@
         return;
       }
 
-      fetch('https://script.google.com/macros/s/AKfycbw7FbJ-ann1qRY2zve7M1XnL8u6j-KPjJ7uUqHVCB8/dev/', {
+      fetch('https://script.google.com/macros/s/AKfycbxFQABJfOgtXfjaDKQ3DtSClhwPxiKQBS-JFHmJhGCP85pir1wypppEQTF2oJ_CaYtK/exec', {
         method: 'POST',
-        body: JSON.stringify({ studentId, name, answer: "" }) // answer는 빈칸
+        body: JSON.stringify({ studentId, name })
       })
       .then(res => res.text())
       .then(msg => {
@@ -68,4 +66,3 @@
   </script>
 </body>
 </html>
-
