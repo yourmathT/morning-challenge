@@ -1,0 +1,57 @@
+// ────────────────────────────────────────────────
+// Google Apps Script: Code.gs
+// ────────────────────────────────────────────────
+
+function doPost(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("응답");
+  const data = JSON.parse(e.postData.contents);
+  const now = new Date();
+  const hour = now.getHours();
+
+  // 시간 제한 확인 (오전 8시 ~ 9시)
+  if (hour < 8 || hour >= 9) {
+    return ContentService.createTextOutput("❌ 지금은 응답 시간이 아니에요! (오전 8시~9시만 가능)");
+  }
+
+  const todayDate = Utilities.formatDate(now, "Asia/Seoul", "yyyy-MM-dd");
+  const studentId = data.studentId;
+
+  // 중복 응답 확인
+  const records = sheet.getDataRange().getValues();
+  for (let i = 1; i < records.length; i++) {
+    const row = records[i];
+    const recordedId = row[0];
+    const recordedDate = Utilities.formatDate(new Date(row[3]), "Asia/Seoul", "yyyy-MM-dd");
+    if (recordedId == studentId && recordedDate === todayDate) {
+      return ContentService.createTextOutput("⚠️ 이미 오늘 응답했어요! 내일 또 도전해 주세요 😊");
+    }
+  }
+
+  // 정답 확인 및 저장
+  const todayAnswer = getTodayAnswer();
+  const isCorrect = data.answer === todayAnswer ? "정답" : "오답";
+
+  sheet.appendRow([
+    studentId,
+    data.name,
+    data.answer,
+    Utilities.formatDate(now, "Asia/Seoul", "yyyy-MM-dd HH:mm:ss"),
+    isCorrect
+  ]);
+
+  const rank = sheet.getLastRow() - 1;
+  return ContentService.createTextOutput(`✅ 제출 완료! 지금 ${rank}번째로 응답했어요 🌟`);
+}
+
+// 날짜별 정답 매핑
+function getTodayAnswer() {
+  const date = Utilities.formatDate(new Date(), "Asia/Seoul", "yyyyMMdd");
+  const quizMap = {
+    "20250714": "O",
+    "20250715": "X",
+    "20250716": "2",
+    // 필요한 날짜 & 정답 추가하세요
+  };
+  return quizMap[date] || "O";
+}
+
