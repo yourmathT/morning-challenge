@@ -1,57 +1,61 @@
-// ────────────────────────────────────────────────
-// Google Apps Script: Code.gs
-// ────────────────────────────────────────────────
-
-function doPost(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("응답");
-  const data = JSON.parse(e.postData.contents);
-  const now = new Date();
-  const hour = now.getHours();
-
-  // 시간 제한 확인 (오전 8시 ~ 9시)
-  if (hour < 8 || hour >= 9) {
-    return ContentService.createTextOutput("❌ 지금은 응답 시간이 아니에요! (오전 8시~9시만 가능)");
-  }
-
-  const todayDate = Utilities.formatDate(now, "Asia/Seoul", "yyyy-MM-dd");
-  const studentId = data.studentId;
-
-  // 중복 응답 확인
-  const records = sheet.getDataRange().getValues();
-  for (let i = 1; i < records.length; i++) {
-    const row = records[i];
-    const recordedId = row[0];
-    const recordedDate = Utilities.formatDate(new Date(row[3]), "Asia/Seoul", "yyyy-MM-dd");
-    if (recordedId == studentId && recordedDate === todayDate) {
-      return ContentService.createTextOutput("⚠️ 이미 오늘 응답했어요! 내일 또 도전해 주세요 😊");
+    <!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>굿모닝 챌린지</title>
+  <style>
+    body {
+      font-family: 'Jua', sans-serif;
+      background-color: #fff8e7;
+      text-align: center;
+      padding-top: 50px;
     }
-  }
+    input, button {
+      font-size: 18px;
+      padding: 10px;
+      margin: 5px;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h1>🌞 굿모닝 챌린지 🌞</h1>
+  <p id="quiz">Q. 오늘의 퀴즈: O/X 또는 1~4 중 하나를 선택해 주세요</p>
 
-  // 정답 확인 및 저장
-  const todayAnswer = getTodayAnswer();
-  const isCorrect = data.answer === todayAnswer ? "정답" : "오답";
+  <input type="text" id="studentId" placeholder="학번 입력"><br>
+  <input type="text" id="name" placeholder="이름 입력"><br>
+  <button onclick="submitAnswer('O')">O</button>
+  <button onclick="submitAnswer('X')">X</button>
+  <button onclick="submitAnswer('1')">1</button>
+  <button onclick="submitAnswer('2')">2</button>
+  <button onclick="submitAnswer('3')">3</button>
+  <button onclick="submitAnswer('4')">4</button>
 
-  sheet.appendRow([
-    studentId,
-    data.name,
-    data.answer,
-    Utilities.formatDate(now, "Asia/Seoul", "yyyy-MM-dd HH:mm:ss"),
-    isCorrect
-  ]);
+  <p id="result" style="margin-top: 20px; font-size: 18px;"></p>
 
-  const rank = sheet.getLastRow() - 1;
-  return ContentService.createTextOutput(`✅ 제출 완료! 지금 ${rank}번째로 응답했어요 🌟`);
-}
+  <script>
+    function submitAnswer(answer) {
+      const studentId = document.getElementById('studentId').value.trim();
+      const name = document.getElementById('name').value.trim();
 
-// 날짜별 정답 매핑
-function getTodayAnswer() {
-  const date = Utilities.formatDate(new Date(), "Asia/Seoul", "yyyyMMdd");
-  const quizMap = {
-    "20250714": "O",
-    "20250715": "X",
-    "20250716": "2",
-    // 필요한 날짜 & 정답 추가하세요
-  };
-  return quizMap[date] || "O";
-}
+      if (!studentId || !name) {
+        return alert("학번과 이름을 모두 입력해주세요!");
+      }
+
+      fetch('https://https://yourmatht.github.io/morning-challenge/', {
+        method: 'POST',
+        body: JSON.stringify({ studentId, name, answer })
+      })
+      .then(res => res.text())
+      .then(msg => {
+        document.getElementById('result').innerText = msg;
+      })
+      .catch(err => {
+        console.error(err);
+        alert("오류가 발생했어요. 다시 시도해주세요.");
+      });
+    }
+  </script>
+</body>
+</html>
 
