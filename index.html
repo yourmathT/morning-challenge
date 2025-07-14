@@ -1,4 +1,6 @@
-    <!DOCTYPE html>
+
+
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -13,38 +15,46 @@
     input, button {
       font-size: 18px;
       padding: 10px;
-      margin: 5px;
+      margin: 8px;
     }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>🌞 굿모닝 챌린지 🌞</h1>
-  <p id="quiz">Q. 오늘의 퀴즈: O/X 또는 1~4 중 하나를 선택해 주세요</p>
+  <h1>🌞 굿모닝 출석체크 🌞</h1>
 
   <input type="text" id="studentId" placeholder="학번 입력"><br>
   <input type="text" id="name" placeholder="이름 입력"><br>
-  <button onclick="submitAnswer('O')">O</button>
-  <button onclick="submitAnswer('X')">X</button>
-  <button onclick="submitAnswer('1')">1</button>
-  <button onclick="submitAnswer('2')">2</button>
-  <button onclick="submitAnswer('3')">3</button>
-  <button onclick="submitAnswer('4')">4</button>
+
+  <p id="clock" style="font-size: 18px; margin-bottom: 20px;">시간 불러오는 중...</p>
+
+  <button onclick="submitForm()">제출</button>
 
   <p id="result" style="margin-top: 20px; font-size: 18px;"></p>
 
   <script>
-    function submitAnswer(answer) {
+    // 실시간 시계
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('ko-KR');
+      document.getElementById('clock').innerText = "현재 시간: " + time;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 제출 함수
+    function submitForm() {
       const studentId = document.getElementById('studentId').value.trim();
       const name = document.getElementById('name').value.trim();
 
       if (!studentId || !name) {
-        return alert("학번과 이름을 모두 입력해주세요!");
+        alert("학번과 이름을 모두 입력해주세요!");
+        return;
       }
 
-      fetch('https://https://yourmatht.github.io/morning-challenge/', {
+      fetch('https://script.google.com/macros/s/AKfycbw7FbJ-ann1qRY2zve7M1XnL8u6j-KPjJ7uUqHVCB8/dev/', {
         method: 'POST',
-        body: JSON.stringify({ studentId, name, answer })
+        body: JSON.stringify({ studentId, name, answer: "" }) // answer는 빈칸
       })
       .then(res => res.text())
       .then(msg => {
