@@ -52,6 +52,9 @@
 
       fetch('https://script.google.com/macros/s/AKfycbxkINxAr-WHJ_ptDlf-U_qWzR3_8F9_vrrUjDg7Jtko4A39XWHK3ANUanBvMfxw2jQA/exec', {
         method: 'POST',
+        headers: {
+           'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ studentId, name })
       })
       .then(res => res.text())
